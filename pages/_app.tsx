@@ -10,6 +10,11 @@ function MyApp({ Component, pageProps }: AppProps) {
 }
 
 const theme = extendTheme({
+	components: {
+		Button: {
+			baseStyle: { _focus: { boxShadow: 'none' } },
+		},
+	},
 	styles: {
 		global: {
 			'*': {
