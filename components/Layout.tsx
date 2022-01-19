@@ -27,7 +27,7 @@ export const Layout = ({
 			<Head>
 				<title>{title}</title>
 			</Head>
-			<Flex flexDir='column' w='100%' minH='100vh' {...props}>
+			<Flex bg='gray.50' flexDir='column' w='100%' minH='100vh' {...props}>
 				{!props.hideHeader && (
 					<Box borderBottomWidth='1px'>
 						<Container maxW='container.xl'>

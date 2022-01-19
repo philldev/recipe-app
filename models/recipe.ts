@@ -3,10 +3,12 @@ export interface Recipe {
 	authorId: string
 	authorName: string
 	title: string
-	description: string
+	description?: string
 	time: string
-	ingredients: string
-	steps: Array<string>
+	difficulty: string
+	ingredients: Array<{ text: string }>
+	steps: Array<{ text: string }>
 	createdAt: string
 	updatedAt: string
+	imageURL: string
 }

@@ -2,15 +2,14 @@ import {
 	Box,
 	Container,
 	Flex,
-	Heading,
 	HStack,
 	Icon,
 	IconButton,
 	Text,
 } from '@chakra-ui/react'
-import { FiChevronLeft, FiUser } from 'react-icons/fi'
-import { GoBook } from 'react-icons/go'
+import { FiChevronLeft } from 'react-icons/fi'
 import { Layout } from '../../components/Layout'
+import { RecipeForm } from '../../components/RecipeForm'
 import NextLink from '../../helpers/next-link'
 
 const NewRecipe = () => {
@@ -38,7 +37,9 @@ const NewRecipe = () => {
 					</Flex>
 				</Container>
 			</Box>
-			<Container maxW='container.xl' py='4'></Container>
+			<Container pos='relative' maxW='container.xl' py='4'>
+				<RecipeForm />
+			</Container>
 		</Layout>
 	)
 }
