@@ -16,6 +16,8 @@ import NextLink from '../helpers/next-link'
 
 export const Layout = ({
 	title = 'Home',
+	hideHeader,
+	rightToolbar,
 	...props
 }: FlexProps & {
 	title?: string
@@ -28,7 +30,7 @@ export const Layout = ({
 				<title>{title}</title>
 			</Head>
 			<Flex bg='gray.50' flexDir='column' w='100%' minH='100vh' {...props}>
-				{!props.hideHeader && (
+				{!hideHeader && (
 					<Box borderBottomWidth='1px'>
 						<Container maxW='container.xl'>
 							<Flex
@@ -46,7 +48,7 @@ export const Layout = ({
 									</NextLink>
 								</HStack>
 								<HStack>
-									{props.rightToolbar}
+									{rightToolbar}
 									<IconButton
 										aria-label='User'
 										title='User'

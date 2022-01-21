@@ -1,5 +1,4 @@
 import {
-	Box,
 	Button,
 	Flex,
 	FormControl,
@@ -10,8 +9,6 @@ import {
 	Icon,
 	IconButton,
 	Input,
-	InputGroup,
-	InputLeftAddon,
 	Radio,
 	RadioGroup,
 	Stack,
@@ -42,6 +39,7 @@ const schema = y
 					text: y.string().required('This field cannot be empty'),
 				})
 			)
+			.min(1)
 			.required(),
 		steps: y
 			.array(
@@ -49,8 +47,9 @@ const schema = y
 					text: y.string().required(),
 				})
 			)
+			.min(1)
 			.required(),
-		imageUrl: y.string().url().required(),
+		imageUrl: y.string().url(),
 	})
 	.required()
 
@@ -69,6 +68,8 @@ export const RecipeForm = () => {
 		control: form.control,
 		name: 'steps',
 	})
+
+	console.log(form.formState.errors)
 
 	return (
 		<VStack
@@ -93,19 +94,23 @@ export const RecipeForm = () => {
 					<FormControl isInvalid={Boolean(form.formState.errors.title)}>
 						<FormLabel>Name</FormLabel>
 						<Input {...form.register('title')} />
-						<FormErrorMessage>{form.formState.errors.title}</FormErrorMessage>
+						<FormErrorMessage>
+							{form.formState.errors.title?.message}
+						</FormErrorMessage>
 					</FormControl>
 					<FormControl isInvalid={Boolean(form.formState.errors.description)}>
 						<FormLabel>Description</FormLabel>
 						<Textarea {...form.register('description')} />
 						<FormErrorMessage>
-							{form.formState.errors.description}
+							{form.formState.errors.description?.message}
 						</FormErrorMessage>
 					</FormControl>
 					<FormControl isInvalid={Boolean(form.formState.errors.time)}>
 						<FormLabel>Time Required</FormLabel>
 						<Input placeholder='60 Mnt' {...form.register('time')} />
-						<FormErrorMessage>{form.formState.errors.time}</FormErrorMessage>
+						<FormErrorMessage>
+							{form.formState.errors.time?.message}
+						</FormErrorMessage>
 					</FormControl>
 
 					<FormControl isInvalid={Boolean(form.formState.errors.difficulty)}>
@@ -121,7 +126,7 @@ export const RecipeForm = () => {
 							</Stack>
 						</RadioGroup>
 						<FormErrorMessage>
-							{form.formState.errors.difficulty}
+							{form.formState.errors.difficulty?.message}
 						</FormErrorMessage>
 					</FormControl>
 				</VStack>
@@ -148,7 +153,10 @@ export const RecipeForm = () => {
 						Add
 					</Button>
 				</HStack>
-				<FormControl flex={['auto', '1']}>
+				<FormControl
+					flex={['auto', '1']}
+					isInvalid={Boolean(form.formState.errors.ingredients)}
+				>
 					<VStack alignItems='stretch'>
 						{ingredientsFieldArray.fields.map((field, index) => (
 							<FormControl
@@ -179,12 +187,17 @@ export const RecipeForm = () => {
 								</FormErrorMessage>
 							</FormControl>
 						))}
+
 						{ingredientsFieldArray.fields.length === 0 && (
 							<FormHelperText>
 								Please add atleast one ingredients
 							</FormHelperText>
 						)}
 					</VStack>
+					<FormErrorMessage>
+						{form.formState.errors.ingredients &&
+							'Please add atleast one ingredients'}
+					</FormErrorMessage>
 				</FormControl>
 			</Flex>
 			<Flex flexDir={['column', 'row']}>
@@ -207,7 +220,10 @@ export const RecipeForm = () => {
 						Add
 					</Button>
 				</HStack>
-				<FormControl flex={['auto', '1']}>
+				<FormControl
+					flex={['auto', '1']}
+					isInvalid={Boolean(form.formState.errors.steps)}
+				>
 					<VStack alignItems='stretch'>
 						{stepsFieldArray.fields.map((field, index) => (
 							<FormControl
@@ -244,10 +260,14 @@ export const RecipeForm = () => {
 							<FormHelperText>Please add atleast one step</FormHelperText>
 						)}
 					</VStack>
+					<FormErrorMessage>
+						{form.formState.errors.steps &&
+							'Please add atleast one ingredients'}
+					</FormErrorMessage>
 				</FormControl>
 			</Flex>
 			<HStack justifyContent='flex-end'>
-				<Button>Create Recipe 🎉</Button>
+				<Button type='submit'>Create Recipe 🎉</Button>
 			</HStack>
 		</VStack>
 	)
