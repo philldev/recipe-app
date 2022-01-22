@@ -7,12 +7,14 @@ import {
 	IconButton,
 	Text,
 } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 import { FiChevronLeft } from 'react-icons/fi'
 import { Layout } from '../../components/Layout'
 import { RecipeForm } from '../../components/RecipeForm'
 import NextLink from '../../helpers/next-link'
 
 const NewRecipe = () => {
+	const router = useRouter()
 	return (
 		<Layout hideHeader title='New Recipe'>
 			<Box borderBottomWidth='1px'>
@@ -38,7 +40,11 @@ const NewRecipe = () => {
 				</Container>
 			</Box>
 			<Container pos='relative' maxW='container.xl' py='4'>
-				<RecipeForm />
+				<RecipeForm
+					onSuccess={() => {
+						router.replace('/')
+					}}
+				/>
 			</Container>
 		</Layout>
 	)

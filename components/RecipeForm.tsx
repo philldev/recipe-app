@@ -20,6 +20,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { FiX } from 'react-icons/fi'
 import * as y from 'yup'
+import { useRecipes } from '../context/recipes'
 import { Recipe } from '../models/recipe'
 
 type RecipeFormData = Omit<
@@ -33,6 +34,7 @@ const schema = y
 		title: y.string().required(),
 		description: y.string(),
 		time: y.string().required(),
+		yields: y.number().required(),
 		ingredients: y
 			.array(
 				y.object({
@@ -53,7 +55,7 @@ const schema = y
 	})
 	.required()
 
-export const RecipeForm = () => {
+export const RecipeForm = (props: { onSuccess: () => void }) => {
 	const form = useForm<RecipeFormData>({
 		defaultValues: {
 			ingredients: [],
@@ -69,7 +71,7 @@ export const RecipeForm = () => {
 		name: 'steps',
 	})
 
-	console.log(form.formState.errors)
+	const { createRecipe } = useRecipes()
 
 	return (
 		<VStack
@@ -83,7 +85,12 @@ export const RecipeForm = () => {
 			spacing={['6', '10']}
 			as='form'
 			onSubmit={form.handleSubmit((data) => {
-				console.log(data)
+				const author = {
+					id: '1',
+					name: 'John',
+				}
+				createRecipe({ ...data, authorId: author.id, authorName: author.name })
+				props.onSuccess()
 			})}
 		>
 			<Flex flexDir={['column', 'row']}>
@@ -187,16 +194,9 @@ export const RecipeForm = () => {
 								</FormErrorMessage>
 							</FormControl>
 						))}
-
-						{ingredientsFieldArray.fields.length === 0 && (
-							<FormHelperText>
-								Please add atleast one ingredients
-							</FormHelperText>
-						)}
 					</VStack>
 					<FormErrorMessage>
-						{form.formState.errors.ingredients &&
-							'Please add atleast one ingredients'}
+						{(form.formState.errors.ingredients as any)?.message}
 					</FormErrorMessage>
 				</FormControl>
 			</Flex>
@@ -211,7 +211,6 @@ export const RecipeForm = () => {
 							const valid = await form.trigger(
 								`steps.${ingredientsFieldArray.fields.length - 1 ?? 0}.text`
 							)
-
 							if (valid) {
 								stepsFieldArray.append({})
 							}
@@ -256,13 +255,9 @@ export const RecipeForm = () => {
 								</FormErrorMessage>
 							</FormControl>
 						))}
-						{stepsFieldArray.fields.length === 0 && (
-							<FormHelperText>Please add atleast one step</FormHelperText>
-						)}
 					</VStack>
 					<FormErrorMessage>
-						{form.formState.errors.steps &&
-							'Please add atleast one ingredients'}
+						{(form.formState.errors.steps as any)?.message}
 					</FormErrorMessage>
 				</FormControl>
 			</Flex>
