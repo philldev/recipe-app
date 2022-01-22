@@ -1,55 +1,77 @@
+import {
+	addDoc,
+	collection,
+	deleteDoc,
+	doc,
+	DocumentData,
+	query,
+	QueryDocumentSnapshot,
+	setDoc,
+	SnapshotOptions,
+	WithFieldValue,
+} from 'firebase/firestore'
 import { nanoid } from 'nanoid'
-import { createContext, FC, useContext } from 'react'
-import useLocalStorage from '../../hooks/use-local-storage'
+import { createContext, FC, useContext, useMemo } from 'react'
+import { useCollectionData } from 'react-firebase-hooks/firestore'
 import { Recipe } from '../../models/recipe'
+import { db } from '../../services/firebase'
 
 interface RecipesContextValue {
-	items: Recipe[]
-	createRecipe: (Recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) => void
-	updateRecipe: (Recipe: Recipe) => void
-	deleteRecipe: (Recipe: Recipe) => void
+	items?: Recipe[]
+	createRecipe: (
+		Recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>
+	) => Promise<void>
+	updateRecipe: (Recipe: Recipe) => Promise<void>
+	deleteRecipe: (Recipe: Recipe) => Promise<void>
 }
 
 const RecipesContext = createContext<RecipesContextValue | null>(null)
 
 export const RecipesProvider: FC = (props) => {
-	const [items, setItems] = useLocalStorage<Recipe[]>(
-		'sample-apps__recipes',
+	const converter = useMemo(
+		() => ({
+			toFirestore(recipe: WithFieldValue<Omit<Recipe, 'id'>>): DocumentData {
+				return recipe
+			},
+			fromFirestore(
+				snapshot: QueryDocumentSnapshot,
+				options: SnapshotOptions
+			): Recipe {
+				const data = snapshot.data(options)!
+				return {
+					id: snapshot.id,
+					...(data as Omit<Recipe, 'id'>),
+				}
+			},
+		}),
 		[]
 	)
+	const [items, isLoading] = useCollectionData<Recipe>(
+		query<Recipe>(collection(db, 'recipes').withConverter<Recipe>(converter))
+	)
 
-	console.log(items)
-
-	const createRecipe: RecipesContextValue['createRecipe'] = (item) => {
+	const createRecipe: RecipesContextValue['createRecipe'] = async (item) => {
 		const newItem = {
 			...item,
-			id: nanoid(),
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
 		}
-		setItems((p) => {
-			return [...p, newItem]
-		})
+
+		await addDoc(collection(db, 'recipes'), newItem)
 	}
 
-	const updateRecipe: RecipesContextValue['updateRecipe'] = (item) => {
+	const updateRecipe: RecipesContextValue['updateRecipe'] = async (item) => {
 		const itemId = item.id
 		const updatedItem = {
 			...item,
 			updatedAt: new Date().toISOString(),
 		}
-		setItems((p) => {
-			return p.map((prevItem) =>
-				prevItem.id === itemId ? updatedItem : prevItem
-			)
-		})
+		await setDoc(doc(db, 'recipes', itemId), updatedItem, { merge: true })
 	}
 
-	const deleteRecipe: RecipesContextValue['deleteRecipe'] = (item) => {
+	const deleteRecipe: RecipesContextValue['deleteRecipe'] = async (item) => {
 		const itemId = item.id
-		setItems((p) => {
-			return p.filter((prevItem) => prevItem.id !== itemId)
-		})
+		await deleteDoc(doc(db, 'recipes', itemId))
 	}
 
 	return (

@@ -3,7 +3,6 @@ import {
 	Flex,
 	FormControl,
 	FormErrorMessage,
-	FormHelperText,
 	FormLabel,
 	HStack,
 	Icon,
@@ -30,11 +29,9 @@ type RecipeFormData = Omit<
 
 const schema = y
 	.object({
-		difficulty: y.string().required(),
 		title: y.string().required(),
 		description: y.string(),
 		time: y.string().required(),
-		yields: y.number().required(),
 		ingredients: y
 			.array(
 				y.object({
@@ -70,6 +67,7 @@ export const RecipeForm = (props: { onSuccess: () => void }) => {
 		control: form.control,
 		name: 'steps',
 	})
+	console.log(form.formState.errors)
 
 	const { createRecipe } = useRecipes()
 
@@ -117,23 +115,6 @@ export const RecipeForm = (props: { onSuccess: () => void }) => {
 						<Input placeholder='60 Mnt' {...form.register('time')} />
 						<FormErrorMessage>
 							{form.formState.errors.time?.message}
-						</FormErrorMessage>
-					</FormControl>
-
-					<FormControl isInvalid={Boolean(form.formState.errors.difficulty)}>
-						<FormLabel>Difficulty</FormLabel>
-						<RadioGroup
-							value={form.watch('difficulty')}
-							onChange={(val) => form.setValue('difficulty', val)}
-						>
-							<Stack>
-								<Radio value='easy'>Easy</Radio>
-								<Radio value='medium'>Medium</Radio>
-								<Radio value='hard'>Hard</Radio>
-							</Stack>
-						</RadioGroup>
-						<FormErrorMessage>
-							{form.formState.errors.difficulty?.message}
 						</FormErrorMessage>
 					</FormControl>
 				</VStack>

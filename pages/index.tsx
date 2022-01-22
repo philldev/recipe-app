@@ -47,7 +47,7 @@ const RecipesList = () => {
 		<Box>
 			<Heading mb='4'>Recipes</Heading>
 			<VStack alignItems='stretch'>
-				{items.map((item) => (
+				{items?.map((item) => (
 					<Flex p='4' rounded='md' bg='white' shadow='sm' key={item.id}>
 						<Flex w='14' h='14' flexShrink='0' mr='2' bg='gray.200'></Flex>
 						<Text fontSize='sm' fontWeight='bold' flex='1'>
@@ -56,7 +56,7 @@ const RecipesList = () => {
 					</Flex>
 				))}
 			</VStack>
-			{items.length === 0 && <Text color='gray.500'>No Recipes Found!</Text>}
+			{items?.length === 0 && <Text color='gray.500'>No Recipes Found!</Text>}
 		</Box>
 	)
 }
