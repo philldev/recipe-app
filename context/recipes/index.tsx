@@ -10,7 +10,6 @@ import {
 	SnapshotOptions,
 	WithFieldValue,
 } from 'firebase/firestore'
-import { nanoid } from 'nanoid'
 import { createContext, FC, useContext, useMemo } from 'react'
 import { useCollectionData } from 'react-firebase-hooks/firestore'
 import { Recipe } from '../../models/recipe'

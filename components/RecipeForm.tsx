@@ -8,9 +8,6 @@ import {
 	Icon,
 	IconButton,
 	Input,
-	Radio,
-	RadioGroup,
-	Stack,
 	Text,
 	Textarea,
 	VStack,
@@ -52,7 +49,11 @@ const schema = y
 	})
 	.required()
 
-export const RecipeForm = (props: { onSuccess: () => void }) => {
+export const RecipeForm = (props: {
+	onSuccess: () => void
+	recipe?: Recipe
+}) => {
+	const isEditing = props.recipe !== undefined
 	const form = useForm<RecipeFormData>({
 		defaultValues: {
 			ingredients: [],
@@ -67,9 +68,8 @@ export const RecipeForm = (props: { onSuccess: () => void }) => {
 		control: form.control,
 		name: 'steps',
 	})
-	console.log(form.formState.errors)
 
-	const { createRecipe } = useRecipes()
+	const { createRecipe, updateRecipe } = useRecipes()
 
 	return (
 		<VStack
@@ -82,13 +82,26 @@ export const RecipeForm = (props: { onSuccess: () => void }) => {
 			alignItems='stretch'
 			spacing={['6', '10']}
 			as='form'
-			onSubmit={form.handleSubmit((data) => {
-				const author = {
-					id: '1',
-					name: 'John',
+			onSubmit={form.handleSubmit(async (data) => {
+				if (!isEditing) {
+					const author = {
+						id: '1',
+						name: 'John',
+					}
+					await createRecipe({
+						...data,
+						authorId: author.id,
+						authorName: author.name,
+					})
+					props.onSuccess()
+				} else {
+					const updatedRecipe = {
+						...props.recipe!,
+						...data,
+					}
+					await updateRecipe(updatedRecipe)
+					props.onSuccess()
 				}
-				createRecipe({ ...data, authorId: author.id, authorName: author.name })
-				props.onSuccess()
 			})}
 		>
 			<Flex flexDir={['column', 'row']}>
