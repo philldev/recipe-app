@@ -73,12 +73,6 @@ export const RecipeForm = (props: {
 
 	return (
 		<VStack
-			bg='white'
-			p='4'
-			rounded='md'
-			shadow='sm'
-			maxW='container.md'
-			mx='auto'
 			alignItems='stretch'
 			spacing={['6', '10']}
 			as='form'

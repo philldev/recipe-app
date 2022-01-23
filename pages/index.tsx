@@ -1,11 +1,14 @@
 import {
 	Button,
+	chakra,
 	Container,
+	Divider,
 	Flex,
 	Heading,
 	Text,
 	VStack,
 } from '@chakra-ui/react'
+import { motion } from 'framer-motion'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { Layout } from '../components/Layout'
@@ -14,11 +17,16 @@ import { useRecipes } from '../context/recipes'
 const Home: NextPage = () => {
 	return (
 		<Layout>
-			<Container py='4'>
-				<Flex mb='4' alignItems='center' justifyContent='space-between'>
-					<Heading>Recipes</Heading>
-					<Button colorScheme='purple'>Create Recipe</Button>
+			<Container bg='white' shadow='md' rounded='xl' py='4'>
+				<Flex alignItems='center' justifyContent='space-between'>
+					<Text fontSize='xl'>Recipes</Text>
+					<Link href='/recipes/new' passHref>
+						<Button as='a' colorScheme='purple'>
+							Create Recipe
+						</Button>
+					</Link>
 				</Flex>
+				<Divider my='4' />
 				<RecipesList />
 			</Container>
 		</Layout>
@@ -29,23 +37,25 @@ const RecipesList = () => {
 	const { items } = useRecipes()
 	return (
 		<>
-			<VStack alignItems='stretch'>
+			<VStack alignItems='stretch' divider={<Divider />} my='4'>
 				{items?.map((item) => (
-					<Link passHref href={`/recipes/${item.id}`} key={item.id}>
+					<Flex key={item.id}>
 						<Flex
-							borderWidth='1px'
-							p='4'
-							rounded='md'
-							bg='white'
-							shadow='sm'
-							key={item.id}
-						>
-							<Flex w='14' h='14' flexShrink='0' mr='2' bg='gray.200'></Flex>
-							<Text fontSize='sm' fontWeight='bold' flex='1'>
+							w='125px'
+							h='125px'
+							flexShrink='0'
+							mr='4'
+							bg='gray.200'
+						></Flex>
+						<Flex flexDir='column' flex='1'>
+							<Text fontSize='xl' fontWeight='bold' flex='1'>
 								{item.title}
 							</Text>
+							<Link passHref href={`/recipes/${item.id}`}>
+								<chakra.a>See Detail</chakra.a>
+							</Link>
 						</Flex>
-					</Link>
+					</Flex>
 				))}
 			</VStack>
 			{items?.length === 0 && <Text color='gray.500'>No Recipes Found!</Text>}
