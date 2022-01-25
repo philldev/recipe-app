@@ -1,13 +1,12 @@
 import {
 	Box,
+	Button,
 	Container,
 	Divider,
 	Flex,
 	Heading,
 	HStack,
 	Icon,
-	List,
-	list,
 	ListItem,
 	OrderedList,
 	Spinner,
@@ -27,9 +26,9 @@ import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { useDocumentData } from 'react-firebase-hooks/firestore'
 import { FiClock } from 'react-icons/fi'
-import { Layout } from '../../components/Layout'
-import { Recipe } from '../../models/recipe'
-import { db } from '../../services/firebase'
+import { Layout } from '../../../components/Layout'
+import { Recipe } from '../../../models/recipe'
+import { db } from '../../../services/firebase'
 
 export default function RecipePage() {
 	return (
@@ -73,13 +72,25 @@ const RecipeDetail = () => {
 		<>
 			<Flex flexDir='column'>
 				<Heading mb='4'>{data.title}</Heading>
-				<HStack divider={<Divider orientation='vertical' h='5' />}>
-					<Text>By {data.authorName}</Text>
-					<HStack>
-						<Icon as={FiClock} />
-						<Text>{data.time}</Text>
+				<Flex align='center' justifyContent='space-between'>
+					<HStack divider={<Divider orientation='vertical' h='5' />}>
+						<Text>By {data.authorName}</Text>
+						<HStack>
+							<Icon as={FiClock} />
+							<Text>{data.time}</Text>
+						</HStack>
 					</HStack>
-				</HStack>
+					<HStack>
+						<Link passHref href={`/recipes/${router.query.id as string}/edit`}>
+							<Button variant='ghost' size='sm'>
+								Edit
+							</Button>
+						</Link>
+						<Button variant='ghost' size='sm'>
+							Delete
+						</Button>
+					</HStack>
+				</Flex>
 				<Divider my='4' />
 				<VStack spacing='4' alignItems='stretch'>
 					<Flex>
@@ -96,32 +107,36 @@ const RecipeDetail = () => {
 							{!data.description && 'No Description'}
 						</Text>
 					</Flex>
-					<Flex>
+					<HStack alignItems='stretch'>
 						<Box flexShrink='0' w='35%'>
-							<Text mb='2' fontWeight='bold'>
+							<Text color='gray.500' mb='2' fontWeight='bold'>
 								Ingredients
 							</Text>
 							<UnorderedList alignItems='stretch'>
 								{data.ingredients.map((ing, index) => (
 									<ListItem key={index}>
-										<Text>{ing.text}</Text>
+										<Text color='gray.600' fontSize='sm'>
+											{ing.text}
+										</Text>
 									</ListItem>
 								))}
 							</UnorderedList>
 						</Box>
 						<Box flex='1'>
-							<Text mb='2' fontWeight='bold'>
+							<Text color='gray.500' mb='2' fontWeight='bold'>
 								Steps
 							</Text>
 							<OrderedList alignItems='stretch'>
-								{data.ingredients.map((ing, index) => (
+								{data.steps.map((step, index) => (
 									<ListItem key={index}>
-										<Text>{ing.text}</Text>
+										<Text color='gray.600' fontSize='sm'>
+											{step.text}
+										</Text>
 									</ListItem>
 								))}
 							</OrderedList>
 						</Box>
-					</Flex>
+					</HStack>
 				</VStack>
 			</Flex>
 		</>

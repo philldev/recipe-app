@@ -12,6 +12,7 @@ import {
 	Textarea,
 	VStack,
 } from '@chakra-ui/react'
+import { deepEqual } from '@firebase/util'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { FiX } from 'react-icons/fi'
@@ -55,9 +56,7 @@ export const RecipeForm = (props: {
 }) => {
 	const isEditing = props.recipe !== undefined
 	const form = useForm<RecipeFormData>({
-		defaultValues: {
-			ingredients: [],
-		},
+		defaultValues: props.recipe ?? {},
 		resolver: yupResolver(schema),
 	})
 	const ingredientsFieldArray = useFieldArray<RecipeFormData>({
@@ -250,7 +249,9 @@ export const RecipeForm = (props: {
 				</FormControl>
 			</Flex>
 			<HStack justifyContent='flex-end'>
-				<Button type='submit'>Create Recipe 🎉</Button>
+				<Button colorScheme='purple' type='submit'>
+					{isEditing ? 'Edit' : 'Create'}
+				</Button>
 			</HStack>
 		</VStack>
 	)

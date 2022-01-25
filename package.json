@@ -12,6 +12,7 @@
 		"@emotion/react": "^11",
 		"@emotion/styled": "^11",
 		"@hookform/resolvers": "^2.8.8",
+		"deep-equal": "^2.0.5",
 		"firebase": "^9.6.4",
 		"framer-motion": "^5",
 		"nanoid": "^3.2.0",
