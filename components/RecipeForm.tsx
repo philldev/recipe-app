@@ -7,18 +7,22 @@ import {
 	HStack,
 	Icon,
 	IconButton,
+	Image,
 	Input,
 	Text,
 	Textarea,
 	VStack,
 } from '@chakra-ui/react'
-import { deepEqual } from '@firebase/util'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { FiX } from 'react-icons/fi'
+import { FiImage, FiUpload, FiX } from 'react-icons/fi'
 import * as y from 'yup'
 import { useRecipes } from '../context/recipes'
 import { Recipe } from '../models/recipe'
+import { useUploadFile } from 'react-firebase-hooks/storage'
+import { storage } from '../services/firebase'
+import { getDownloadURL, ref } from 'firebase/storage'
 
 type RecipeFormData = Omit<
 	Recipe,
@@ -46,7 +50,7 @@ const schema = y
 			)
 			.min(1)
 			.required(),
-		imageUrl: y.string().url(),
+		imageUrl: y.string().url().required(),
 	})
 	.required()
 
@@ -69,6 +73,23 @@ export const RecipeForm = (props: {
 	})
 
 	const { createRecipe, updateRecipe } = useRecipes()
+
+	const [uploadFile, uploading, snapshot, error] = useUploadFile()
+
+	const fileRef = useRef<HTMLInputElement | null>(null)
+
+	const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+
+	console.log(uploading)
+
+	// const reader = useMemo(() => new FileReader(), [])
+
+	// useEffect(() => {
+	// 	reader.addEventListener('load', () => {
+	// 		let result = reader.result
+	// 		console.log(result)
+	// 	})
+	// }, [reader])
 
 	return (
 		<VStack
@@ -121,6 +142,71 @@ export const RecipeForm = (props: {
 						<Input placeholder='60 Mnt' {...form.register('time')} />
 						<FormErrorMessage>
 							{form.formState.errors.time?.message}
+						</FormErrorMessage>
+					</FormControl>
+					<FormControl isInvalid={Boolean(form.formState.errors.title)}>
+						<FormLabel>Photo</FormLabel>
+						<HStack>
+							<Flex
+								rounded='md'
+								bg='gray.200'
+								flexShrink='0'
+								alignItems='center'
+								w='32'
+								h='32'
+								justifyContent='center'
+								pos='relative'
+								overflow='hidden'
+							>
+								{photoPreview ? (
+									<Image
+										pos='absolute'
+										inset='0'
+										alt='Preview'
+										objectFit='cover'
+										src={photoPreview}
+									/>
+								) : (
+									<Icon as={FiImage} />
+								)}
+							</Flex>
+							<VStack flex='1' alignItems='flex-start'>
+								<Input
+									hidden
+									placeholder='URL'
+									{...form.register('imageURL')}
+								/>
+								<Input
+									onChange={async (e) => {
+										const file = e.target.files ? e.target.files[0] : null
+										if (file) {
+											const a = await uploadFile(
+												ref(storage, new Date().toTimeString() + '.jpeg'),
+												file
+											)
+											let url = await getDownloadURL(a!.ref)
+											setPhotoPreview(url)
+											form.setValue('imageURL', url)
+										}
+									}}
+									hidden
+									type='file'
+									accept='image/*'
+									ref={fileRef}
+								/>
+								<Button
+									onClick={() => {
+										fileRef.current?.click()
+									}}
+									isLoading={uploading}
+									rightIcon={<Icon as={FiUpload} />}
+								>
+									Choose File
+								</Button>
+							</VStack>
+						</HStack>
+						<FormErrorMessage>
+							{form.formState.errors.imageURL?.message}
 						</FormErrorMessage>
 					</FormControl>
 				</VStack>
