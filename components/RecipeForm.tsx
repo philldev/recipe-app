@@ -80,17 +80,6 @@ export const RecipeForm = (props: {
 
 	const [photoPreview, setPhotoPreview] = useState<string | null>(null)
 
-	console.log(uploading)
-
-	// const reader = useMemo(() => new FileReader(), [])
-
-	// useEffect(() => {
-	// 	reader.addEventListener('load', () => {
-	// 		let result = reader.result
-	// 		console.log(result)
-	// 	})
-	// }, [reader])
-
 	return (
 		<VStack
 			alignItems='stretch'
@@ -148,15 +137,19 @@ export const RecipeForm = (props: {
 						<FormLabel>Photo</FormLabel>
 						<HStack>
 							<Flex
+								flex='1'
 								rounded='md'
 								bg='gray.200'
 								flexShrink='0'
 								alignItems='center'
-								w='32'
-								h='32'
+								w='100%'
+								pt='100%'
 								justifyContent='center'
 								pos='relative'
 								overflow='hidden'
+								onClick={() => {
+									fileRef.current?.click()
+								}}
 							>
 								{photoPreview ? (
 									<Image
@@ -167,43 +160,38 @@ export const RecipeForm = (props: {
 										src={photoPreview}
 									/>
 								) : (
-									<Icon as={FiImage} />
+									<Flex
+										alignItems='center'
+										justifyContent='center'
+										flexDir='column'
+										pos='absolute'
+										transform='translate(-50%, -50%)'
+										top='50%'
+										left='50%'
+									>
+										<Icon as={FiImage} mb='2' />
+										<Text fontSize='xs'>Click to upload</Text>
+									</Flex>
 								)}
 							</Flex>
-							<VStack flex='1' alignItems='flex-start'>
-								<Input
-									hidden
-									placeholder='URL'
-									{...form.register('imageURL')}
-								/>
-								<Input
-									onChange={async (e) => {
-										const file = e.target.files ? e.target.files[0] : null
-										if (file) {
-											const a = await uploadFile(
-												ref(storage, new Date().toTimeString() + '.jpeg'),
-												file
-											)
-											let url = await getDownloadURL(a!.ref)
-											setPhotoPreview(url)
-											form.setValue('imageURL', url)
-										}
-									}}
-									hidden
-									type='file'
-									accept='image/*'
-									ref={fileRef}
-								/>
-								<Button
-									onClick={() => {
-										fileRef.current?.click()
-									}}
-									isLoading={uploading}
-									rightIcon={<Icon as={FiUpload} />}
-								>
-									Choose File
-								</Button>
-							</VStack>
+							<Input
+								onChange={async (e) => {
+									const file = e.target.files ? e.target.files[0] : null
+									if (file) {
+										const a = await uploadFile(
+											ref(storage, new Date().toTimeString() + '.jpeg'),
+											file
+										)
+										let url = await getDownloadURL(a!.ref)
+										setPhotoPreview(url)
+										form.setValue('imageURL', url)
+									}
+								}}
+								hidden
+								type='file'
+								accept='image/*'
+								ref={fileRef}
+							/>
 						</HStack>
 						<FormErrorMessage>
 							{form.formState.errors.imageURL?.message}

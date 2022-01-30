@@ -8,13 +8,14 @@ import {
 	Heading,
 	HStack,
 	Icon,
+	Image,
 	Text,
 	VStack,
 } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import type { NextPage } from 'next'
 import Link from 'next/link'
-import { FiClock, FiUser } from 'react-icons/fi'
+import { FiClock, FiImage, FiUser } from 'react-icons/fi'
 import { Layout } from '../components/Layout'
 import { useRecipes } from '../context/recipes'
 
@@ -50,7 +51,23 @@ const RecipesList = () => {
 							flexShrink='0'
 							mr='4'
 							bg='gray.200'
-						></Flex>
+							pos='relative'
+							justifyContent='center'
+							alignItems='center'
+							rounded='md'
+						>
+							{item.imageURL ? (
+								<Image
+									src={item.imageURL}
+									alt={item.title}
+									inset='0'
+									pos='absolute'
+									objectFit='cover'
+								/>
+							) : (
+								<Icon as={FiImage} mb='2' />
+							)}
+						</Flex>
 						<Flex flexDir='column' flex='1'>
 							<Box>
 								<Text noOfLines={1} fontSize='xl' fontWeight='bold'>
