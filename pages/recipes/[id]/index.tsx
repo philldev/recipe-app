@@ -1,4 +1,10 @@
 import {
+	AlertDialog,
+	AlertDialogBody,
+	AlertDialogContent,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogOverlay,
 	Box,
 	Button,
 	Container,
@@ -23,10 +29,11 @@ import {
 } from 'firebase/firestore'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useDocumentData } from 'react-firebase-hooks/firestore'
 import { FiClock } from 'react-icons/fi'
 import { Layout } from '../../../components/Layout'
+import { useRecipes } from '../../../context/recipes'
 import { Recipe } from '../../../models/recipe'
 import { db } from '../../../services/firebase'
 
@@ -86,9 +93,7 @@ const RecipeDetail = () => {
 								Edit
 							</Button>
 						</Link>
-						<Button variant='ghost' size='sm'>
-							Delete
-						</Button>
+						<DeleteDialog recipe={data} />
 					</HStack>
 				</Flex>
 				<Divider my='4' />
@@ -139,6 +144,61 @@ const RecipeDetail = () => {
 					</HStack>
 				</VStack>
 			</Flex>
+		</>
+	)
+}
+
+function DeleteDialog(props: { recipe: Recipe }) {
+	const [isOpen, setIsOpen] = useState(false)
+	const onClose = () => setIsOpen(false)
+	const cancelRef = useRef<HTMLButtonElement | null>(null)
+
+	const { deleteRecipe } = useRecipes()
+	const router = useRouter()
+
+	const onDelete = () => {
+		deleteRecipe(props.recipe)
+		router.push('/')
+	}
+
+	return (
+		<>
+			<Button
+				variant='ghost'
+				size='sm'
+				onClick={() => {
+					setIsOpen(true)
+				}}
+			>
+				Delete
+			</Button>
+
+			<AlertDialog
+				isOpen={isOpen}
+				leastDestructiveRef={cancelRef}
+				onClose={onClose}
+			>
+				<AlertDialogOverlay>
+					<AlertDialogContent>
+						<AlertDialogHeader fontSize='lg' fontWeight='bold'>
+							Delete Recipe
+						</AlertDialogHeader>
+
+						<AlertDialogBody>
+							Are you sure? You can{`'`}t undo this action afterwards.
+						</AlertDialogBody>
+
+						<AlertDialogFooter>
+							<Button ref={cancelRef} onClick={onClose}>
+								Cancel
+							</Button>
+							<Button colorScheme='red' onClick={onDelete} ml={3}>
+								Delete
+							</Button>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialogOverlay>
+			</AlertDialog>
 		</>
 	)
 }
